@@ -13,26 +13,42 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use( (req, res, next) => {
+  setTimeout(() => {
+    next()
+  },2000)
+})
 app.get("/", (req, res) => {
   res.redirect("/signin");
 });
 
 app.get("/signin", async (req, res) => {
-  const token = req.cookies.token;
-  const { username, password } = jwt.verify(token, "secret");
-  const user = await userModel.findOne({ username });
-  if (user != null) {
-    res.render("profile", { username, password });
-    return;
+  const token = await req.cookies.token;
+  if (token) {
+    const jwtCookie = jwt.verify(token, "secret");
+    const user = await userModel.findOne({
+      username: jwtCookie.username,
+    });
+    if (user) {
+      const isPass = bcrypt.compare(jwtCookie.password, user.password);
+      if (isPass) {
+        return res.redirect(`/profile/${jwtCookie.username}`);
+      }
+    }
   }
-  res.render("signin", { message: "" });
+  res.render("signin", { message: "Enter Your Login Details" });
+});
+
+app.get("/profile/:username", async (req, res) => {
+  const user = await userModel.findOne({ username: req.params.username });
+  res.send(user);
 });
 app.get("/signup", (req, res) => {
   res.render("signup", { message: "" });
 });
 
 app.get("/logout", (req, res) => {
-  res.clearCookie("token");
+  res.cookie("token", "");
   res.redirect("/signin");
 });
 
@@ -54,7 +70,6 @@ app.post("/signin", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body);
   const user = await userModel.findOne({ username });
   if (user == null) {
     bcrypt.hash("a", 10, async function (err, hash) {
@@ -69,5 +84,5 @@ app.post("/signup", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("Listening on port " + port);
+  console.log("Listen on port " + port)
 });
