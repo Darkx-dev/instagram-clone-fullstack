@@ -13,11 +13,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use( (req, res, next) => {
+app.use((req, res, next) => {
+  // if (req.cookies.token) res.redirect("/signin")
   setTimeout(() => {
-    next()
-  },2000)
-})
+    next();
+  }, 1000);
+});
+
 app.get("/", (req, res) => {
   res.redirect("/signin");
 });
@@ -55,7 +57,6 @@ app.get("/logout", (req, res) => {
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
   const token = jwt.sign({ username, password }, "secret");
-  res.cookie("token", token);
   const jwtCookie = jwt.verify(token, "secret");
   const user = await userModel.findOne({ username });
   if (user == null) {
@@ -63,7 +64,8 @@ app.post("/signin", async (req, res) => {
   } else {
     const isPass = bcrypt.compare(password, jwtCookie.password);
     if (isPass) {
-      res.render("profile", { username, password });
+      res.cookie("token", token);
+      return res.redirect(`/profile/${jwtCookie.username}`);
     }
   }
 });
@@ -72,17 +74,23 @@ app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
   if (user == null) {
-    bcrypt.hash("a", 10, async function (err, hash) {
-      await userModel.create({ username, password: hash });
-    });
-    const token = jwt.sign({ username, password }, "secret");
-    res.cookie("token", token);
-    res.render("signin", { message: "Re-enter Login Details" });
+    if (username != "" && password != "") {
+      bcrypt.hash("a", 10, async function (err, hash) {
+        await userModel.create({ username, password: hash });
+      });
+      const token = jwt.sign({ username, password }, "secret");
+      res.cookie("token", token);
+      return res.redirect("/signin");
+    } else {
+      return res.render("signup", {
+        message: "username/passowrd cannot be blank",
+      });
+    }
   } else {
-    res.render("signup", { message: "Username Already Taken" });
+    return res.render("signup", { message: "Username Already Taken" });
   }
 });
 
 app.listen(port, () => {
-  console.log("Listen on port " + port)
+  console.log("Listen on port " + port);
 });
