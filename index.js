@@ -4,8 +4,37 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const app = express();
-const userModel = require("./usermodel");
+const userModel = require("./models/usermodel");
+// const { isAuthorised } = require("./auth");
 const port = 8080;
+
+// Functions for protected routes
+const isAuthorised = async (req, res, next) => {
+  const token = req.cookies.token || null;
+
+  if (token != null) {
+    const { username, password } = jwt.verify(token, "secret");
+    const user = await userModel.findOne({
+      username,
+    });
+    if (user) {
+      const isPass = await bcrypt.compare(password, user.password);
+      if (isPass) {
+        req.user = { username, password };
+        next();
+        return;
+      } else {
+        res.send("negga");
+        return;
+      }
+    }
+  } else if (req.url == "/signin") {
+    next();
+    return;
+  }
+
+  res.redirect("/signin");
+};
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
@@ -13,84 +42,78 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  // if (req.cookies.token) res.redirect("/signin")
-  setTimeout(() => {
-    next();
-  }, 1000);
-});
-
 app.get("/", (req, res) => {
   res.redirect("/signin");
 });
 
-app.get("/signin", async (req, res) => {
-  const token = await req.cookies.token;
-  if (token) {
-    const jwtCookie = jwt.verify(token, "secret");
-    const user = await userModel.findOne({
-      username: jwtCookie.username,
-    });
-    if (user) {
-      const isPass = bcrypt.compare(jwtCookie.password, user.password);
-      if (isPass) {
-        return res.redirect(`/profile/${jwtCookie.username}`);
-      }
-    }
+app.get("/signin", isAuthorised, async (req, res) => {
+  if (req.user) {
+    const user = await userModel.findOne({ username: req.user.username });
+    res.redirect(`/profile/${user.username}`);
+    return;
   }
-  res.render("signin", { message: "Enter Your Login Details" });
+  res.status(404).render("signin", { message: "Enter Login Details" });
 });
 
-app.get("/profile/:username", async (req, res) => {
-  const user = await userModel.findOne({ username: req.params.username });
-  res.send(user);
+app.get("/profile/:username", isAuthorised, async (req, res) => {
+  if (req.params.username == req.user.username) {
+    const user = await userModel.findOne({ username: req.user.username });
+    res.render("profile", { user });
+    return;
+  }
+  res.status(404).redirect("/signin");
 });
 app.get("/signup", (req, res) => {
   res.render("signup", { message: "" });
 });
 
 app.get("/logout", (req, res) => {
-  res.cookie("token", "");
+  res.clearCookie("token");
   res.redirect("/signin");
 });
 
-app.post("/signin", async (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const token = jwt.sign({ username, password }, "secret");
-  const jwtCookie = jwt.verify(token, "secret");
-  const user = await userModel.findOne({ username });
-  if (user == null) {
-    res.render("signin", { message: "username/password error" });
-  } else {
-    const isPass = bcrypt.compare(password, jwtCookie.password);
-    if (isPass) {
-      res.cookie("token", token);
-      return res.redirect(`/profile/${jwtCookie.username}`);
+  if (token) {
+    const jwtCookie = jwt.verify(token, "secret");
+    const user = await userModel.findOne({ username });
+    if (user) {
+      const isPass = await bcrypt.compare(jwtCookie.password, user.password);
+      if (isPass) {
+        res.cookie("token", token);
+        res.redirect(`/profile/${jwtCookie.username}`);
+        return;
+      }
     }
   }
+  res.status(404).render("signin", { message: "Invalid Login Details" });
 });
 
 app.post("/signup", async (req, res) => {
+  // res.connection.setTimeout(0);
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
-  if (user == null) {
+  if (!user) {
     if (username != "" && password != "") {
-      bcrypt.hash("a", 10, async function (err, hash) {
-        await userModel.create({ username, password: hash });
-      });
       const token = jwt.sign({ username, password }, "secret");
       res.cookie("token", token);
-      return res.redirect("/signin");
+      bcrypt.hash(password, 10, async function (err, hash) {
+        await userModel.create({ username, password: hash });
+      });
+      res.redirect(`/profile/${username}`);
     } else {
-      return res.render("signup", {
+      res.render("signup", {
         message: "username/passowrd cannot be blank",
       });
+      return;
     }
-  } else {
-    return res.render("signup", { message: "Username Already Taken" });
   }
+  res.render("signup", { message: "Username Already Taken" });
 });
 
-app.listen(port, () => {
-  console.log("Listen on port " + port);
-});
+app.get("/file" , (req, res) => {
+  res.sendFile(path.join(__dirname, "files/Ninja_Kamui_Eng_Dub_-_12_1080p.mp4"));
+})
+
+app.listen(port, () => {});

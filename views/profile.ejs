@@ -7,8 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <h1>Profile Page</h1>
-    username : <%= username %>
-    password : <%= password %>
+   <main class="bg-zinc-800 min-h-screen">
+    <h1>Your Profile</h1>
+    <div class="pfp">
+        <img src="" alt="Upload Image">
+    </div>
+    <div class="user__bio">
+        <h2>Username : <span><%= user.username %></span> </h2>
+        <h2>Email : <span><%= user.age %></span> </h2>
+    </div>
+   </main>
 </body>
 </html>
