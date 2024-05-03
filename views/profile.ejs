@@ -1,21 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Your Profile Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-   <main class="bg-zinc-800 min-h-screen">
-    <h1>Your Profile</h1>
-    <div class="pfp">
-        <img src="" alt="Upload Image">
-    </div>
-    <div class="user__bio">
-        <h2>Username : <span><%= user.username %></span> </h2>
-        <h2>Email : <span><%= user.age %></span> </h2>
-    </div>
-   </main>
-</body>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100vh;
+      }
+
+      input[type="file"]::file-selector-button {
+        margin-right: 20px;
+        border: none;
+        background: #084cdf;
+        padding: 10px 20px;
+        border-radius: 10px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background: #0d45a5;
+      }
+
+      .drop-container {
+        position: relative;
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        width: 100%;
+        margin: 10px 0;
+        border-radius: 10px;
+        border: 2px dashed #555;
+        color: #444;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out, border 0.2s ease-in-out;
+      }
+
+      .drop-container:hover {
+        background: #eee;
+        border-color: #111;
+      }
+
+      .drop-container:hover .drop-title {
+        color: #222;
+      }
+
+      .drop-title {
+        color: #444;
+        font-size: 20px;
+        font-weight: bold;
+        text-align: center;
+        transition: color 0.2s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="max-sm:bg-zinc-800">
+    <main
+      class="bg-zinc-800 text-white bg-red-500 max-sm:bg-zinc-900 flex flex-col justify-center items-center min-h-screen"
+    >
+      <a
+        class="bg-yellow-700 mr-5 rounded-md px-5 py-2 text-white self-end"
+        href="/logout"
+        >Logout</a
+      >
+      <div
+        class="profile__card bg-zinc-900 p-10 rounded-md tracking-wide max-sm:w-screen max-sm:space-y-5"
+      >
+        <div
+          class="pfp flex flex-col items-center justify-center w-[350px] max-sm:w-full"
+        >
+          <img class="object-cover w-full rounded-full aspect-square"
+          src="<%=user.image==null?"https://media1.tenor.com/m/D7c5XWyUtW8AAAAd/nike-keychain.gif":user.image%>"
+          alt="Upload Image" /> <% if (!user.image) { %>
+          <form
+            class="flex flex-col items-center justify-center w-full"
+            action="/upload"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <label for="images" class="drop-container" id="dropcontainer">
+              <span class="drop-title">Drop Pfp here</span>
+              or
+              <input
+                class="w-full"
+                type="file"
+                id="images"
+                accept="image/*"
+                name="uploadFile"
+                multiple="false"
+              />
+            </label>
+            <button class="bg-purple-800 w-full py-2 rounded-md" type="submit">
+              Submit File
+            </button>
+          </form>
+          <% } %>
+        </div>
+        <div class="user__bio text-xl font-normal">
+          <h1 class="text-4xl font-bold tracking-widest text-center uppercase">
+            <%= user?.username %>
+          </h1>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>

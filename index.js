@@ -1,3 +1,4 @@
+const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const bcrypt = require("bcrypt");
@@ -36,8 +37,29 @@ const isAuthorised = async (req, res, next) => {
   res.redirect("/signin");
 };
 
+// const isAuthorisedToUpload = async (req, res, next) => {
+//   const token = req.cookies.token || null;
+//   if (token) {
+//     const { username, password } = jwt.verify(token, "secret");
+//     const user = await userModel.findOne({
+//       username,
+//     });
+//     if (user) {
+//       const isPass = await bcrypt.compare(password, user.password);
+//       if (isPass) {
+//         next();
+//         return;
+//       } else {
+//         res.send("negga die!");
+//         return;
+//       }
+//     }
+//   }
+// }
+
 app.set("view engine", "ejs");
-app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/static", express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -112,8 +134,33 @@ app.post("/signup", async (req, res) => {
   res.render("signup", { message: "Username Already Taken" });
 });
 
-app.get("/file" , (req, res) => {
-  res.sendFile(path.join(__dirname, "files/Ninja_Kamui_Eng_Dub_-_12_1080p.mp4"));
-})
+app.post("/upload", isAuthorised, fileUpload(), async function (req, res) {
+  console.log(req.files);
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+  // else if (req.files.uploadFile.size > 200000) {
+  //   return res.status(400).send("File size exceeds")
+  // }
+
+  let uploadedFile = req.files.uploadFile;
+  const imageExtention = uploadedFile.name.slice(
+    uploadedFile.name.lastIndexOf("."),
+    uploadedFile.name.name
+  );
+  // const currentUser = await userModel.findOne({username: req.user.username})
+
+  uploadedFile.mv(
+    path.join(__dirname, `/public/pfp/${req.user.username + imageExtention}`),
+    async (err) => {
+      if (err) return res.status(500).send(err);
+      await userModel.findOneAndUpdate(
+        { username: req.user.username },
+        { image: `/static/pfp/${req.user.username + imageExtention}` }
+      );
+      res.redirect(`/profile/${req.user.username}`);
+    }
+  );
+});
 
 app.listen(port, () => {});
