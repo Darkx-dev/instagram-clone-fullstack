@@ -1,4 +1,5 @@
 const fileUpload = require("express-fileupload");
+// const mongoConnection = require('./mongoConnect')
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const bcrypt = require("bcrypt");
@@ -6,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 const app = express();
 const userModel = require("./models/usermodel");
+const { rmSync } = require("fs");
 // const { isAuthorised } = require("./auth");
 const port = 8080;
 
@@ -13,49 +15,22 @@ const port = 8080;
 const isAuthorised = async (req, res, next) => {
   const token = req.cookies.token || null;
 
-  if (token != null) {
+  if (token) {
     const { username, password } = jwt.verify(token, "secret");
     const user = await userModel.findOne({
       username,
     });
     if (user) {
       const isPass = await bcrypt.compare(password, user.password);
+      req.user = { username, isAuthorised: isPass };
       if (isPass) {
-        req.user = { username, password };
         next();
-        return;
-      } else {
-        res.send("negga");
         return;
       }
     }
-  } else if (req.url == "/signin") {
-    next();
-    return;
   }
-
-  res.redirect("/signin");
+  res.redirect("/signin")
 };
-
-// const isAuthorisedToUpload = async (req, res, next) => {
-//   const token = req.cookies.token || null;
-//   if (token) {
-//     const { username, password } = jwt.verify(token, "secret");
-//     const user = await userModel.findOne({
-//       username,
-//     });
-//     if (user) {
-//       const isPass = await bcrypt.compare(password, user.password);
-//       if (isPass) {
-//         next();
-//         return;
-//       } else {
-//         res.send("negga die!");
-//         return;
-//       }
-//     }
-//   }
-// }
 
 app.set("view engine", "ejs");
 
@@ -64,16 +39,14 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.redirect("/signin");
+app.get("/", isAuthorised, async (req, res) => {
+  if (req.user.isAuthorised) {
+    return res.redirect(`/profile/${req.user.username}`);
+  }
+  res.redirect("/signup");
 });
 
-app.get("/signin", isAuthorised, async (req, res) => {
-  if (req.user) {
-    const user = await userModel.findOne({ username: req.user.username });
-    res.redirect(`/profile/${user.username}`);
-    return;
-  }
+app.get("/signin", async (req, res) => {
   res.status(404).render("signin", { message: "Enter Login Details" });
 });
 
@@ -96,17 +69,13 @@ app.get("/logout", (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  const token = jwt.sign({ username, password }, "secret");
-  if (token) {
-    const jwtCookie = jwt.verify(token, "secret");
-    const user = await userModel.findOne({ username });
-    if (user) {
-      const isPass = await bcrypt.compare(jwtCookie.password, user.password);
-      if (isPass) {
-        res.cookie("token", token);
-        res.redirect(`/profile/${jwtCookie.username}`);
-        return;
-      }
+  const user = await userModel.findOne({ username });
+  if (user) {
+    const isPass = bcrypt.compare(password, user.password);
+    if (isPass) {
+      const token = jwt.sign({ username, password }, "secret");
+      res.cookie("token", token);
+      return res.redirect(`/profile/${username}`);
     }
   }
   res.status(404).render("signin", { message: "Invalid Login Details" });
@@ -117,7 +86,7 @@ app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
   if (!user) {
-    if (username != "" && password != "") {
+    if (username.length != 0 && password.length != 0) {
       const token = jwt.sign({ username, password }, "secret");
       res.cookie("token", token);
       bcrypt.hash(password, 10, async function (err, hash) {
@@ -125,10 +94,9 @@ app.post("/signup", async (req, res) => {
       });
       res.redirect(`/profile/${username}`);
     } else {
-      res.render("signup", {
+      return res.render("signup", {
         message: "username/passowrd cannot be blank",
       });
-      return;
     }
   }
   res.render("signup", { message: "Username Already Taken" });
