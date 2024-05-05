@@ -1,120 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Profile Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-      }
 
-      html,
-      body {
-        min-height: 100vh;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%=user.username%>
+  </title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/styles/profile.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css"> -->
+</head>
 
-      input[type="file"]::file-selector-button {
-        margin-right: 20px;
-        border: none;
-        background: #084cdf;
-        padding: 10px 20px;
-        border-radius: 10px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-      }
-
-      input[type="file"]::file-selector-button:hover {
-        background: #0d45a5;
-      }
-
-      .drop-container {
-        position: relative;
-        display: flex;
-        gap: 10px;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        width: 100%;
-        margin: 10px 0;
-        border-radius: 10px;
-        border: 2px dashed #555;
-        color: #444;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out, border 0.2s ease-in-out;
-      }
-
-      .drop-container:hover {
-        background: #eee;
-        border-color: #111;
-      }
-
-      .drop-container:hover .drop-title {
-        color: #222;
-      }
-
-      .drop-title {
-        color: #444;
-        font-size: 20px;
-        font-weight: bold;
-        text-align: center;
-        transition: color 0.2s ease-in-out;
-      }
-    </style>
-  </head>
-  <body class="max-sm:bg-zinc-800">
-    <main
-      class="bg-zinc-800 text-white bg-red-500 max-sm:bg-zinc-900 flex flex-col justify-center items-center min-h-screen"
-    >
-      <a
-        class="bg-yellow-700 mr-5 rounded-md px-5 py-2 text-white self-end"
-        href="/logout"
-        >Logout</a
-      >
-      <div
-        class="profile__card bg-zinc-900 p-10 rounded-md tracking-wide max-sm:w-screen max-sm:space-y-5"
-      >
-        <div
-          class="pfp flex flex-col items-center justify-center w-[350px] max-sm:w-full"
-        >
-          <img class="object-cover w-full rounded-full aspect-square"
-          src="<%=user.image==null?"https://media1.tenor.com/m/D7c5XWyUtW8AAAAd/nike-keychain.gif":user.image%>"
-          alt="Upload Image" /> <% if (!user.image) { %>
-          <form
-            class="flex flex-col items-center justify-center w-full"
-            action="/upload"
-            method="post"
-            enctype="multipart/form-data"
-          >
-            <label for="images" class="drop-container" id="dropcontainer">
-              <span class="drop-title">Drop Pfp here</span>
-              or
-              <input
-                class="w-full"
-                type="file"
-                id="images"
-                accept="image/*"
-                name="uploadFile"
-                multiple="false"
-              />
-            </label>
-            <button class="bg-purple-800 w-full py-2 rounded-md" type="submit">
-              Submit File
-            </button>
-          </form>
-          <% } %>
+<body class="bg-black text-white relative">
+  <nav class="flex justify-between md:hidden p-3">
+    <button onclick="handleSettingsPopUp()" class="user__settings ">
+      <svg class="w-[22px]" xmlns="http://www.w3.org/2000/svg" fill="#fff" viewBox="0 0 512 512">
+        <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+        <path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z" />
+      </svg>
+    </button>
+    <div class="nav__username flex items-center gap-1">
+      <h1 class="text-sm font-light">
+        <%=user.username%>
+      </h1>
+      <span style="display: inline-block; transform: rotate(180deg);"><svg aria-label="Down chevron icon" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="12" role="img" viewBox="0 0 24 24" width="12">
+          <title>Down chevron icon</title>
+          <path d="M21 17.502a.997.997 0 0 1-.707-.293L12 8.913l-8.293 8.296a1 1 0 1 1-1.414-1.414l9-9.004a1.03 1.03 0 0 1 1.414 0l9 9.004A1 1 0 0 1 21 17.502Z"></path>
+        </svg></span>
+    </div>
+    <svg aria-label="" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="24" role="img" viewBox="0 0 192 192" width="24">
+      <title></title>
+      <path class="xcslo1z" d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.881 72.2328C81.6116 63.5383 90.6052 61.6848 97.2286 61.6848C97.3051 61.6848 97.3819 61.6848 97.4576 61.6855C105.707 61.7381 111.932 64.1366 115.961 68.814C118.893 72.2193 120.854 76.925 121.825 82.8638C114.511 81.6207 106.601 81.2385 98.145 81.7233C74.3247 83.0954 59.0111 96.9879 60.0396 116.292C60.5615 126.084 65.4397 134.508 73.775 140.011C80.8224 144.663 89.899 146.938 99.3323 146.423C111.79 145.74 121.563 140.987 128.381 132.296C133.559 125.696 136.834 117.143 138.28 106.366C144.217 109.949 148.617 114.664 151.047 120.332C155.179 129.967 155.42 145.8 142.501 158.708C131.182 170.016 117.576 174.908 97.0135 175.059C74.2042 174.89 56.9538 167.575 45.7381 153.317C35.2355 139.966 29.8077 120.682 29.6052 96C29.8077 71.3178 35.2355 52.0336 45.7381 38.6827C56.9538 24.4249 74.2039 17.11 97.0132 16.9405C119.988 17.1113 137.539 24.4614 149.184 38.788C154.894 45.8136 159.199 54.6488 162.037 64.9503L178.184 60.6422C174.744 47.9622 169.331 37.0357 161.965 27.974C147.036 9.60668 125.202 0.195148 97.0695 0H96.9569C68.8816 0.19447 47.2921 9.6418 32.7883 28.0793C19.8819 44.4864 13.2244 67.3157 13.0007 95.9325L13 96L13.0007 96.0675C13.2244 124.684 19.8819 147.514 32.7883 163.921C47.2921 182.358 68.8816 191.806 96.9569 192H97.0695C122.03 191.827 139.624 185.292 154.118 170.811C173.081 151.866 172.51 128.119 166.26 113.541C161.776 103.087 153.227 94.5962 141.537 88.9883ZM98.4405 129.507C88.0005 130.095 77.1544 125.409 76.6196 115.372C76.2232 107.93 81.9158 99.626 99.0812 98.6368C101.047 98.5234 102.976 98.468 104.871 98.468C111.106 98.468 116.939 99.0737 122.242 100.233C120.264 124.935 108.662 128.946 98.4405 129.507Z"></path>
+    </svg>
+  </nav>
+  <main class="flex flex-col">
+    <div class="top user__profile__wrapper flex flex-col max-md:p-3 max-md:pb-0">
+      <div class="user__profile__top w-full flex justify-center gap-24 max-md:gap-5 max-md:justify-between">
+        <div class="user__pfp__wrapper flex items-center justify-center">
+          <div class="user__pfp overflow-hidden rounded-full w-[150px] max-md:min-w-[50px] border-2 border-white bg-zinc-700 ">
+            <img class="w-full object-cover aspect-square object-center" src="<%=!user?.image?"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXh3OW9xaWt2cTltYzF3ZTZubGVhZjVlem4wdGE5ZGg4bnFtcW0zaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjHERaTIdeuFQrXq/giphy.gif":user.image %>" alt=" ">
+          </div>
         </div>
-        <div class="user__bio text-xl font-normal">
-          <h1 class="text-4xl font-bold tracking-widest text-center uppercase">
-            <%= user?.username %>
-          </h1>
+        <div class="user__info flex flex-col gap-4 p-10 max-md:p-0 max-md:w-full">
+          <div class="user__info__top flex justify-start items-center max-md:block max-md:space-y-3 gap-5">
+            <div class="username__wrapper min-w-24 text-[20px]">
+              <h2><%=user?.username%></h2>
+            </div>
+            <div class="buttons flex gap-2 items-center w-fit justify-end">
+              <button onclick="window.location.href ='/profile/<%=user?.username%>/edit'" class="edit__profile bg-[#363636] hover:bg-[#262626] px-3 py-1 rounded-md font-bold text-sm">Edit Profile</button>
+              <button class="view__archive bg-[#363636] hover:bg-[#262626] px-3 py-1 rounded-md font-bold text-sm">View Archive</button>
+              <button onclick="handleSettingsPopUp()" class="user__settings max-md:hidden ">
+                <svg class="w-[22px]" xmlns="http://www.w3.org/2000/svg" fill="#fff" viewBox="0 0 512 512">
+                  <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                  <path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="user__info__middle user__info__counts__desktop flex justify-start items-center gap-10 max-md:hidden">
+            <div class="posts__count">
+              <span class="font-bold">7</span>
+              <span>posts</span>
+            </div>
+            <div class="followers__count">
+              <span class="font-bold">1M</span>
+              <span>followers</span>
+            </div>
+            <div class="following__count">
+              <span class="font-bold">7</span>
+              <span>following</span>
+            </div>
+          </div>
+          <div class="user__info__bottom user__bio__desktop max-md:hidden flex flex-col items-start justify-start">
+            <p>Systum <br>Fad <br>Denge <br>Systum Fad Denge.... </p>
+          </div>
         </div>
       </div>
-    </main>
-  </body>
+      <div class="user__bio__mobile md:hidden flex flex-col items-start justify-start mt-5">
+        <p>Systum <br>Fad <br>Denge <br>Systum Fad Denge.... </p>
+      </div>
+      <div class="user__profile__bottom user__highlights__wrapper flex justify-center flex-col mx-[10%] max-md:m-0 h-[150px]">
+        <div class="add__highlight__wrapper text-center flex">
+          <button class="add__highlight__btn">
+            <div class="w-[77px] h-[77px] bg-black border-2 border-[#232323] flex justify-center items-center rounded-full">
+
+              <div class="add__highlight bg-[#121212] w-[92%] h-[92%] flex justify-center items-center rounded-full">
+                <svg aria-label="Plus icon" class="x1lliihq x1n2onr6 x10xgr34" fill="#737373" height="30" role="img" viewBox="0 0 24 24" width="30">
+                  <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z"></path>
+                </svg>
+              </div>
+
+            </div>
+            <span class="text-sm">New</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="user__info__counts__mobile border-t-2 border-[#202020] md:hidden grid grid-cols-3 text-center max-md:py-3">
+      <div class="posts__count flex flex-col">
+        <span class="font-bold">7</span>
+        <span>posts</span>
+      </div>
+      <div class="followers__count flex flex-col">
+        <span class="font-bold">1M</span>
+        <span>followers</span>
+      </div>
+      <div class="following__count flex flex-col">
+        <span class="font-bold">7</span>
+        <span>following</span>
+      </div>
+    </div>
+    <div class="bottom user__gallary border-t-2 border-[#202020] w-[85%] max-md:w-full self-center mt-10 max-md:mt-0">
+      <div class="user__gallary__options py-5 max-md:py-3">
+        <a href="#">
+          <div class="option__saved uppercase text-sm flex justify-center items-center gap-1">
+            <svg aria-label="" class="x1lliihq x1n2onr6 x5n08af" fill="currentColor" height="12" role="img" viewBox="0 0 24 24" width="12">
+              <title></title>
+              <rect fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="18" x="3" y="3"></rect>
+              <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="9.015" x2="9.015" y1="3" y2="21"></line>
+              <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="14.985" x2="14.985" y1="3" y2="21"></line>
+              <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="9.015" y2="9.015"></line>
+              <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="21" x2="3" y1="14.985" y2="14.985"></line>
+            </svg>
+            <span>saved</span>
+          </div>
+        </a>
+      </div>
+      <div class="user__posts__wrapper grid grid-cols-3 gap-2 max-md:gap-1">
+        <div class="user__post">
+          <div class="post__image overflow-hidden">
+            <img class="aspect-square object-cover" src="https://imgs.search.brave.com/j6oR8Qh9vtsaWiUfkBWR44vj3tr9ExSqveTcsrwTYac/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/aS13YWxrLWEtbG9u/ZWx5LXJvYWQuanBn/P3dpZHRoPTEwMDAm/Zm9ybWF0PXBqcGcm/ZXhpZj0wJmlwdGM9/MA" alt="">
+          </div>
+        </div>
+        <div class="user__post">
+          <div class="post__image overflow-hidden">
+            <img class="aspect-square object-cover" src="https://imgs.search.brave.com/j6oR8Qh9vtsaWiUfkBWR44vj3tr9ExSqveTcsrwTYac/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/aS13YWxrLWEtbG9u/ZWx5LXJvYWQuanBn/P3dpZHRoPTEwMDAm/Zm9ybWF0PXBqcGcm/ZXhpZj0wJmlwdGM9/MA" alt="">
+          </div>
+        </div>
+        <div class="user__post">
+          <div class="post__image overflow-hidden">
+            <img class="aspect-square object-cover" src="https://imgs.search.brave.com/j6oR8Qh9vtsaWiUfkBWR44vj3tr9ExSqveTcsrwTYac/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/aS13YWxrLWEtbG9u/ZWx5LXJvYWQuanBn/P3dpZHRoPTEwMDAm/Zm9ybWF0PXBqcGcm/ZXhpZj0wJmlwdGM9/MA" alt="">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <div class="settings__popup__wrapper hidden absolute top-[0] backdrop-blur-[1.5px] left-0 right-0 h-screen grid place-content-center">
+    <div class="settings__popup bg-[#262626] rounded-xl my-auto text-center w-[400px] overflow-hidden">
+      <ul class="list-none w-full">
+        <li class="py-3 active:bg-[#202020]">Apps and websites</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">QE code</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Notifications</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Settings and privacy</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Supervision</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Log out</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]" id="cancle">
+          Cancel
+        </li>
+      </ul>
+    </div>
+  </div>
+  <script src="/static/javascripts/profileFunctions.js"></script>
+</body>
+
 </html>

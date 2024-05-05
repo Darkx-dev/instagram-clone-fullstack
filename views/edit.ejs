@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit profile | <%=user?.username %></title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-black px-52 max-md:px-2 py-10 text-white">
+  <header>
+    <h1 class="font-bold text-2xl py-5">Edit profile</h1>
+  </header>
+  <main>
+    <div class="edit__pfp bg-[#262626] p-4 rounded-md flex items-center justify-between">
+      <div class="current__wrapper flex items-center gap-5">
+        <div class="current__pfp border-2 w-[60px] bg-zinc-700 rounded-full">
+          <img class="object-cover aspect-square object-center" src="<%=user?.image%>" alt="">
+        </div>
+        <div class="current__details">
+          <div class="current__username">
+            <h3 class="username text-xl font-bold"><%=user?.username %></h3>
+          </div>
+          <div class="current__bio">
+            <p><%=user.bio %></p>
+          </div>
+        </div>
+      </div>
+      <div class="upload__btn_wrapper">
+        <label class="bg-[#1877F2] px-3 py-2 rounded-md cursor-pointer" for="upload__pfp">
+          Change photo
+        </label>
+        <form action="upload" method="post" enctype="multipart/form-data">
+            <input hidden type="file" name="uploadedFile" id="upload__pfp" onchange="form.submit()">
+          </form>
+          
+      </div>
+
+    </div>
+  </main>
+</body>
+
+</html>

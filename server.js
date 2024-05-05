@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const app = express();
-const userModel = require("./models/usermodel");
+const userModel = require("./models/user");
 const { rmSync } = require("fs");
 // const { isAuthorised } = require("./auth");
 const port = 8080;
@@ -16,20 +16,22 @@ const isAuthorised = async (req, res, next) => {
   const token = req.cookies.token || null;
 
   if (token) {
+    // return res.send(token)
     const { username, password } = jwt.verify(token, "secret");
     const user = await userModel.findOne({
       username,
     });
+    // return res.send(user)
     if (user) {
       const isPass = await bcrypt.compare(password, user.password);
-      req.user = { username, isAuthorised: isPass };
+      req.data = { user: user, isAuthorised: isPass };
       if (isPass) {
-        next();
-        return;
+        // return res.send(isPass)
+        return next();
       }
     }
   }
-  res.redirect("/signin")
+  res.redirect("/login")
 };
 
 app.set("view engine", "ejs");
@@ -40,31 +42,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", isAuthorised, async (req, res) => {
-  if (req.user.isAuthorised) {
-    return res.redirect(`/profile/${req.user.username}`);
+  if (req.data.isAuthorised) {
+    return res.redirect(`/profile/${req.data.user.username}`);
   }
-  res.redirect("/signup");
+  res.redirect("/create");
 });
 
-app.get("/signin", async (req, res) => {
-  res.status(404).render("signin", { message: "Enter Login Details" });
+app.get("/login", async (req, res) => {
+  res.status(404).render("login", { message: "Enter Login Details" });
 });
 
 app.get("/profile/:username", isAuthorised, async (req, res) => {
-  if (req.params.username == req.user.username) {
-    const user = await userModel.findOne({ username: req.user.username });
-    res.render("profile", { user });
+  if (req.params.username == req.data.user.username) {
+    res.render("profile", { user: req.data.user });
     return;
   }
-  res.status(404).redirect("/signin");
+  res.status(404).redirect("/login");
 });
-app.get("/signup", (req, res) => {
-  res.render("signup", { message: "" });
+app.get("/create", (req, res) => {
+  res.render("register", { message: "" });
 });
 
 app.get("/logout", (req, res) => {
   res.clearCookie("token");
-  res.redirect("/signin");
+  res.redirect("/login");
 });
 
 app.post("/login", async (req, res) => {
@@ -78,10 +79,10 @@ app.post("/login", async (req, res) => {
       return res.redirect(`/profile/${username}`);
     }
   }
-  res.status(404).render("signin", { message: "Invalid Login Details" });
+  res.status(404).render("login", { message: "Invalid Login Details" });
 });
 
-app.post("/signup", async (req, res) => {
+app.post("/create", async (req, res) => {
   // res.connection.setTimeout(0);
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
@@ -99,36 +100,39 @@ app.post("/signup", async (req, res) => {
       });
     }
   }
-  res.render("signup", { message: "Username Already Taken" });
+  res.render("loginPage", { message: "Username Already Taken" });
 });
 
-app.post("/upload", isAuthorised, fileUpload(), async function (req, res) {
-  console.log(req.files);
+app.post("/profile/:username/upload", isAuthorised, fileUpload(), async function (req, res) {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send("No files were uploaded.");
   }
-  // else if (req.files.uploadFile.size > 200000) {
-  //   return res.status(400).send("File size exceeds")
-  // }
-
-  let uploadedFile = req.files.uploadFile;
+  let uploadedFile = req.files.uploadedFile;
   const imageExtention = uploadedFile.name.slice(
     uploadedFile.name.lastIndexOf("."),
     uploadedFile.name.name
   );
-  // const currentUser = await userModel.findOne({username: req.user.username})
-
+  if (imageExtention!= ".png" && imageExtention!= ".jpg") {
+    return res.status(400).send("Invalid File Type");
+  }
   uploadedFile.mv(
-    path.join(__dirname, `/public/pfp/${req.user.username + imageExtention}`),
+    path.join(__dirname, `/public/pfp/${req.data.user.username + imageExtention}`),
     async (err) => {
       if (err) return res.status(500).send(err);
       await userModel.findOneAndUpdate(
-        { username: req.user.username },
-        { image: `/static/pfp/${req.user.username + imageExtention}` }
+        { username: req.data.user.username },
+        { image: `/static/pfp/${req.data.user.username + imageExtention}` }
       );
-      res.redirect(`/profile/${req.user.username}`);
+      res.redirect(`/profile/${req.data.user.username}`);
     }
   );
 });
+
+app.get("/profile/:username/edit",isAuthorised, (req, res) => {
+  if (req.data.isAuthorised) {
+    return res.render("edit", {user: req.data.user})
+  }
+  res.status(404).redirect("/login");
+})
 
 app.listen(port, () => {});
