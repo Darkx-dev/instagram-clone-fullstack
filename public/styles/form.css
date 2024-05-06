@@ -62,7 +62,7 @@
   }
   
   .main {
-    background-color: #fafafa;
+    /* background-color: #fafafa; */
     order: 4;
     flex-grow: 1;
     -webkit-box-flex: 1;
@@ -109,9 +109,9 @@
   }
   
   .login-box {
-    background: #fff;
+    /* background: #fff; */
     border: 1px solid #e6e6e6;
-    border-radius: 1px;
+    border-radius: 10px;
     margin:0 0 10px;
     padding: 10px 0;
     /* align-items: center; */
@@ -142,12 +142,12 @@
   input {
     height: 36px;
     border: 1px solid #efefef;
-    border-radius: 3px;
-    background-color: #fafafa;
+    border-radius: 5px;
+    /* background-color: #fafafa; */
     width:100%;
     font-size:12px;
     margin: 0;
-    padding: 9px 0 7px 8px;
+    /* padding: 9px 0 7px 8px; */
     outline: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -182,14 +182,14 @@
     font-size:12px;
     margin-top:12px;
     text-align: center;
-    color:#003569;
+    color:#3897f0;
     line-height: 14px!important;
   }
   
   .text {
     text-align:center;
     margin:15px;
-    color:#262626;
+    /* color:#262626; */
     font-size:14px;
   }
   
@@ -201,7 +201,7 @@
   /* App Store */
   .app p {
     line-height: 18px;
-    color:#262626;
+    color:#ffffff;
     font-size:14px;
     text-align:center;
     margin:10px 20px;
@@ -226,16 +226,16 @@
   
   /* FOOTER */
   .footer {
-    background-color: #fafafa;
+    /* background-color: #fafafa; */
     order: 5;
     padding: 0 20px;
-    background: #fafafa;
+    /* background: #fafafa; */
   }
   
   .footer-container {
     flex-direction: row;  
     flex-wrap:wrap;
-    background-color: #fafafa;
+    /* background-color: #fafafa; */
     justify-content: space-between;
     padding: 38px 0;
     max-width:935px;
@@ -263,7 +263,7 @@
   }
   
   .footer-nav ul li a {
-    color: #003569;
+    color: #ffffff;
     text-decoration: none;
   }
   
@@ -272,7 +272,7 @@
   }
   
   span.language { 
-    color: #003569;
+    color: #ffffff;
     cursor: pointer;
     display: inline-block;
     font-weight: 600;
@@ -294,7 +294,7 @@
   /* Media Queries */
   @media (max-width:450px) {
     .main {
-      background-color: #fff;
+      /* background-color: #fff; */
     }
   
     .content {
@@ -335,17 +335,16 @@
       border: 1px solid #efefef;
       border-radius: 3px;
       height: 36px;
-      background: #fafafa;
+      /* background: #fafafa; */
       position: relative;
     }
   
     input {
       border: 0;
-      background-color: #fafafa;
+      /* background-color: #fafafa; */
       width:100%;
       font-size:12px;
       margin: 0;
-      padding: 9px 0 7px 8px;
       outline: none;
       overflow: hidden;
       text-overflow: ellipsis;

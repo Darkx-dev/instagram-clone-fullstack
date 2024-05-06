@@ -18,7 +18,7 @@
   <aside class="md:border-r-2 border-[#363636] w-[16%] max-md:w-full z-50 flex md:flex-col md:px-5 md:py-10 fixed max-md:border-t-2 left-0 md:top-0 bottom-0">
     <%- include('./sidebar.ejs', {user}) %>
   </aside>
-  
+
   <main class="flex flex-col absolute -z-10 max-md:z-[initial] max-md:relative max-md:w-full top-0 right-0 w-[80%] max-md:pt-10">
     <nav class="flex justify-between md:hidden p-3 max-md:fixed top-0 left-0 right-0">
       <button onclick="handleSettingsPopUp()" class="user__settings ">
@@ -54,7 +54,7 @@
               <h2><%=user?.username%></h2>
             </div>
             <div class="buttons flex gap-2 items-center w-fit justify-end">
-              <button onclick="window.location.href ='/profile/<%=user?.username%>/edit'" class="edit__profile bg-[#363636] hover:bg-[#262626] px-3 py-1 rounded-md font-bold text-sm">Edit Profile</button>
+              <button onclick="window.location.href ='/<%=user?.username%>/edit'" class="edit__profile bg-[#363636] hover:bg-[#262626] px-3 py-1 rounded-md font-bold text-sm">Edit Profile</button>
               <button class="view__archive bg-[#363636] hover:bg-[#262626] px-3 py-1 rounded-md font-bold text-sm">View Archive</button>
               <button onclick="handleSettingsPopUp()" class="user__settings max-md:hidden ">
                 <svg class="w-[22px]" xmlns="http://www.w3.org/2000/svg" fill="#fff" viewBox="0 0 512 512">
@@ -134,21 +134,13 @@
         </a>
       </div>
       <div class="user__posts__wrapper grid grid-cols-3 gap-2 max-md:gap-1">
-        <div class="user__post">
-          <div class="post__image overflow-hidden">
-            <img class="aspect-square object-cover" src="https://imgs.search.brave.com/j6oR8Qh9vtsaWiUfkBWR44vj3tr9ExSqveTcsrwTYac/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/aS13YWxrLWEtbG9u/ZWx5LXJvYWQuanBn/P3dpZHRoPTEwMDAm/Zm9ybWF0PXBqcGcm/ZXhpZj0wJmlwdGM9/MA" alt="">
+        <% user?.posts.forEach(post => { %>
+          <div class="user__post">
+            <div class="post__image overflow-hidden">
+              <img class="aspect-square object-cover" src="/static/users/<%=user._id%>/posts/<%=post %>.png" alt="">
+            </div>
           </div>
-        </div>
-        <div class="user__post">
-          <div class="post__image overflow-hidden">
-            <img class="aspect-square object-cover" src="https://imgs.search.brave.com/j6oR8Qh9vtsaWiUfkBWR44vj3tr9ExSqveTcsrwTYac/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/aS13YWxrLWEtbG9u/ZWx5LXJvYWQuanBn/P3dpZHRoPTEwMDAm/Zm9ybWF0PXBqcGcm/ZXhpZj0wJmlwdGM9/MA" alt="">
-          </div>
-        </div>
-        <div class="user__post">
-          <div class="post__image overflow-hidden">
-            <img class="aspect-square object-cover" src="https://imgs.search.brave.com/j6oR8Qh9vtsaWiUfkBWR44vj3tr9ExSqveTcsrwTYac/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/aS13YWxrLWEtbG9u/ZWx5LXJvYWQuanBn/P3dpZHRoPTEwMDAm/Zm9ybWF0PXBqcGcm/ZXhpZj0wJmlwdGM9/MA" alt="">
-          </div>
-        </div>
+        <% }) %>
 
       </div>
       <footer class="my-3 py-2 w-full"></footer>
@@ -170,7 +162,7 @@
       </ul>
     </div>
   </div>
-  
+
   <script src="/static/javascripts/profileFunctions.js"></script>
 </body>
 

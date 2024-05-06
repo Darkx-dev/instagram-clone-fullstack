@@ -1,5 +1,4 @@
 const fileUpload = require("express-fileupload");
-// const mongoConnection = require('./mongoConnect')
 const cookieParser = require("cookie-parser");
 const express = require("express");
 const bcrypt = require("bcrypt");
@@ -9,9 +8,15 @@ const app = express();
 const { mkdir } = require("fs").promises;
 const userModel = require("./models/user");
 const postModel = require("./models/post");
-// const { isAuthorised } = require("./auth");
 const port = 8080;
 
+const makeDirectories = async (req) => {
+  // Making Directories for each user before creating and setting up user.image path
+  await mkdir("public/users").catch((err) => {});
+  await mkdir(`public/users/${req.data.user._id}`).catch((err) => {});
+  await mkdir(`public/users/${req.data.user._id}/pfp`).catch((err) => {});
+  await mkdir(`public/users/${req.data.user._id}/posts`).catch((err) => {});
+};
 // Functions for protected routes
 const isAuthorised = async (req, res, next) => {
   const token = req.cookies.token || null;
@@ -44,16 +49,16 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", isAuthorised, async (req, res) => {
   if (req.data.isAuthorised) {
-    return res.redirect(`/profile/${req.data.user.username}`);
+    return res.redirect(`/${req.data.user.username}`);
   }
   res.redirect("/create");
 });
 
 app.get("/login", async (req, res) => {
-  res.status(404).render("login", { message: "Enter Login Details" });
+  res.status(404).render("login", { message: "" });
 });
 
-app.get("/profile/:username", isAuthorised, async (req, res) => {
+app.get("/:username", isAuthorised, async (req, res) => {
   if (req.params.username == req.data.user.username) {
     res.render("profile", { user: req.data.user });
     return;
@@ -77,7 +82,7 @@ app.post("/login", async (req, res) => {
     if (isPass) {
       const token = jwt.sign({ username, password }, "secret");
       res.cookie("token", token);
-      return res.redirect(`/profile/${username}`);
+      return res.redirect(`/${username}`);
     }
   }
   res.status(404).render("login", { message: "Invalid Login Details" });
@@ -94,61 +99,89 @@ app.post("/create", async (req, res) => {
       bcrypt.hash(password, 10, async function (err, hash) {
         await userModel.create({ username, password: hash });
       });
-      res.redirect(`/profile/${username}`);
+      res.redirect(`/${username}`);
     } else {
       return res.render("signup", {
         message: "username/passowrd cannot be blank",
       });
     }
   }
-  res.render("loginPage", { message: "Username Already Taken" });
+  res.render("register", { message: "Username Already Taken" });
 });
 
+//Upload Pfp----------------------------------------------------------------
+app.post("/:username/upload", isAuthorised, fileUpload(), async (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+  let uploadedFile = req.files.uploadedFile;
+  const imageExtention = uploadedFile.name.slice(
+    uploadedFile.name.lastIndexOf("."),
+    uploadedFile.name.name
+  );
+
+  await makeDirectories(req);
+
+  if (imageExtention == ".png" || imageExtention == ".jpg") {
+    // Uploading pfp to pfp directory
+    return uploadedFile.mv(
+      path.join(
+        __dirname,
+        `/public/users/${req.data.user._id}/pfp/${req.data.user._id}.png`
+      ),
+      async (err) => {
+        if (err) return res.status(500).send(err);
+        await userModel.findOneAndUpdate(
+          { username: req.data.user._id },
+          {
+            image: `/static/users/${req.data.user._id}/pfp/${req.data.user._id}.png`,
+          }
+        );
+        return res.redirect(`/${req.data.user.username}`);
+      }
+    );
+  }
+  res.send("error");
+  // res.redirect(`/${req.data.user.username}`);
+});
+
+//Create a new post----------------------------------------------------------------
 app.post(
-  "/profile/:username/upload",
+  "/:username/posts/new",
   isAuthorised,
   fileUpload(),
   async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded.");
     }
-    let uploadedFile = req.files.uploadedFile;
-    const imageExtention = uploadedFile.name.slice(
-      uploadedFile.name.lastIndexOf("."),
-      uploadedFile.name.name
+
+    await makeDirectories(req)
+
+    const user = await userModel.findOne({username: req.params.username})
+    console.log(user)
+    const post = await postModel.create({
+      user: req.data.user._id,
+      caption: req.body.caption
+    })
+    user.posts.push(post._id)
+    await user.save()
+
+    let uploadedPost = req.files.uploadedPost
+    uploadedPost.mv(
+      path.join(
+        __dirname,
+        `/public/users/${req.data.user._id}/posts/${post._id}.png`
+      ),
+      async (err) => {
+        if (err) return res.status(500).send(err);
+      }
     );
 
-    // Making Directories for each user before creating and setting up user.image path
-    await mkdir("public/users").catch((err) => {});
-    await mkdir(`public/users/${req.data.user._id}`).catch((err) => {});
-    await mkdir(`public/users/${req.data.user._id}/pfp`).catch((err) => {});
-    await mkdir(`public/users/${req.data.user._id}/posts`).catch((err) => {});
-
-    if (imageExtention == ".png" || imageExtention == ".jpg") {
-      // Uploading pfp to pfp directory
-      return uploadedFile.mv(
-        path.join(
-          __dirname,
-          `/public/users/${req.data.user._id}/pfp/${req.data.user._id}.png`
-        ),
-        async (err) => {
-          if (err) return res.status(500).send(err);
-          await userModel.findOneAndUpdate(
-            { username: req.data.user._id },
-            {
-              image: `/static/users/${req.data.user._id}/pfp/${req.data.user._id}.png`,
-            }
-          );
-          return res.redirect(`/profile/${req.data.user.username}`);
-        }
-      );
-    }
-    res.send("error")
-    // res.redirect(`/profile/${req.data.user.username}`);
+    res.redirect(`/${req.data.user.username}`);
   }
 );
 
-app.get("/profile/:username/edit", isAuthorised, (req, res) => {
+app.get("/:username/edit", isAuthorised, async (req, res) => {
   if (req.data.isAuthorised) {
     return res.render("edit", { user: req.data.user });
   }
