@@ -16,8 +16,8 @@
   <main>
     <div class="edit__pfp bg-[#262626] p-4 rounded-md flex items-center justify-between">
       <div class="current__wrapper flex items-center gap-5">
-        <div class="current__pfp border-2 w-[60px] bg-zinc-700 rounded-full">
-          <img class="object-cover aspect-square object-center" src="<%=user?.image%>" alt="">
+        <div class="current__pfp border-2 w-fit overflow-hidden bg-zinc-700 rounded-full">
+          <img class="object-cover aspect-square w-[50px] object-center" src="<%=user?.image%>" alt="">
         </div>
         <div class="current__details">
           <div class="current__username">
@@ -33,9 +33,8 @@
           Change photo
         </label>
         <form action="upload" method="post" enctype="multipart/form-data">
-            <input hidden type="file" name="uploadedFile" id="upload__pfp" onchange="form.submit()">
-          </form>
-          
+          <input hidden type="file" name="uploadedFile" id="upload__pfp" onchange="form.submit()">
+        </form>
       </div>
 
     </div>

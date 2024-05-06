@@ -1,64 +1,58 @@
-# Authentication Backend
+I apologize for the confusion. This Instagram clone is currently designed to work on a local server. Here's an updated version of the README.md file:
 
-A simple authentication backend built using Node.js, Express, Bcrypt, JWT, Mongoose, and EJS templating engine.
+# Instagram Clone
 
-## Features
-
-- User authentication using Express, Bcrypt, and JWT
-- Database connection with Mongoose on a local server
-- Session management with cookie-parser
-- EJS templating engine for dynamic content rendering
+This is a simple Instagram clone built using Node.js, Express, EJS templating engine, and Mongoose for the backend. It also includes authentication features using bcrypt, JWT, and cookie-parser, and is designed to work on a local server.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help you get a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
 - Node.js
-- NPM
-- MongoDB
+- Express
+- EJS
+- Mongoose
+- bcrypt
+- JWT
+- Cookie-parser
+- FS
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development environment running
-
 1. Clone the repository
-   ```
-   git clone https://github.com/Darkx-dev/authentication-backend.git
-   ```
-2. Install NPM packages
-   ```
-   npm install
-   ```
-3. Update the MongoDB connection string in `index.js`
-4. Start the server
-   ```
-   npm start
-   ```
+2. Install Node.js and other required packages
+3. Set up your local server
+4. Run the application
+
+## Important Note
+
+This project is designed to work on a local server only.
 
 ## Built With
 
-* [Node.js](https://nodejs.org/) - JavaScript runtime
-* [Express](https://expressjs.com/) - Web framework for Node.js
-* [Bcrypt](https://www.npmjs.com/package/bcrypt) - Library to help you hash passwords
-* [JWT](https://www.npmjs.com/package/jsonwebtoken) - JSON Web Token for authentication
-* [Mongoose](https://mongoosejs.com/) - MongoDB object modeling tool
-* [Cookie-parser](https://www.npmjs.com/package/cookie-parser) - Parse Cookie header and populate `req.cookies` with an object keyed by the cookie names.
-* [EJS](https://ejs.co/) - Embedded JavaScript templates
+- Node.js
+- Express
+- EJS
+- Mongoose
+- bcrypt
+- JWT
+- Cookie-parser
+- FS
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://github.com/Darkx-dev/authentication-backend/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests to us.
 
 ## Authors
 
-* **Darkx-dev** - *Initial work* - [Darkx-dev](https://github.com/Darkx-dev)
-
-See also the list of [contributors](https://github.com/Darkx-dev/authentication-backend/contributors) who participated in this project.
+- Darkx-dev
 
 ## License
 
-This project is licensed under the MIT
+This project is licensed under the MIT License.
+
+## About
+
+This project is an Instagram clone with authentication features, designed to work on a local server.

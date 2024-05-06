@@ -6,8 +6,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const app = express();
+const { mkdir } = require("fs").promises;
 const userModel = require("./models/user");
-const { rmSync } = require("fs");
+const postModel = require("./models/post");
 // const { isAuthorised } = require("./auth");
 const port = 8080;
 
@@ -31,7 +32,7 @@ const isAuthorised = async (req, res, next) => {
       }
     }
   }
-  res.redirect("/login")
+  res.redirect("/login");
 };
 
 app.set("view engine", "ejs");
@@ -103,36 +104,55 @@ app.post("/create", async (req, res) => {
   res.render("loginPage", { message: "Username Already Taken" });
 });
 
-app.post("/profile/:username/upload", isAuthorised, fileUpload(), async function (req, res) {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send("No files were uploaded.");
-  }
-  let uploadedFile = req.files.uploadedFile;
-  const imageExtention = uploadedFile.name.slice(
-    uploadedFile.name.lastIndexOf("."),
-    uploadedFile.name.name
-  );
-  if (imageExtention!= ".png" && imageExtention!= ".jpg") {
-    return res.status(400).send("Invalid File Type");
-  }
-  uploadedFile.mv(
-    path.join(__dirname, `/public/pfp/${req.data.user.username + imageExtention}`),
-    async (err) => {
-      if (err) return res.status(500).send(err);
-      await userModel.findOneAndUpdate(
-        { username: req.data.user.username },
-        { image: `/static/pfp/${req.data.user.username + imageExtention}` }
-      );
-      res.redirect(`/profile/${req.data.user.username}`);
+app.post(
+  "/profile/:username/upload",
+  isAuthorised,
+  fileUpload(),
+  async (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send("No files were uploaded.");
     }
-  );
-});
+    let uploadedFile = req.files.uploadedFile;
+    const imageExtention = uploadedFile.name.slice(
+      uploadedFile.name.lastIndexOf("."),
+      uploadedFile.name.name
+    );
 
-app.get("/profile/:username/edit",isAuthorised, (req, res) => {
+    // Making Directories for each user before creating and setting up user.image path
+    await mkdir("public/users").catch((err) => {});
+    await mkdir(`public/users/${req.data.user._id}`).catch((err) => {});
+    await mkdir(`public/users/${req.data.user._id}/pfp`).catch((err) => {});
+    await mkdir(`public/users/${req.data.user._id}/posts`).catch((err) => {});
+
+    if (imageExtention == ".png" || imageExtention == ".jpg") {
+      // Uploading pfp to pfp directory
+      return uploadedFile.mv(
+        path.join(
+          __dirname,
+          `/public/users/${req.data.user._id}/pfp/${req.data.user._id}.png`
+        ),
+        async (err) => {
+          if (err) return res.status(500).send(err);
+          await userModel.findOneAndUpdate(
+            { username: req.data.user._id },
+            {
+              image: `/static/users/${req.data.user._id}/pfp/${req.data.user._id}.png`,
+            }
+          );
+          return res.redirect(`/profile/${req.data.user.username}`);
+        }
+      );
+    }
+    res.send("error")
+    // res.redirect(`/profile/${req.data.user.username}`);
+  }
+);
+
+app.get("/profile/:username/edit", isAuthorised, (req, res) => {
   if (req.data.isAuthorised) {
-    return res.render("edit", {user: req.data.user})
+    return res.render("edit", { user: req.data.user });
   }
   res.status(404).redirect("/login");
-})
+});
 
 app.listen(port, () => {});
