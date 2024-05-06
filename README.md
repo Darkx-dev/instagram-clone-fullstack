@@ -1,8 +1,6 @@
-I apologize for the confusion. This Instagram clone is currently designed to work on a local server. Here's an updated version of the README.md file:
-
 # Instagram Clone
 
-This is a simple Instagram clone built using Node.js, Express, EJS templating engine, and Mongoose for the backend. It also includes authentication features using bcrypt, JWT, and cookie-parser, and is designed to work on a local server.
+This is a simple Instagram clone built using Node.js, Express, EJS templating engine, and Mongoose for the backend. It includes authentication features using bcrypt, JWT, and cookie-parser, and is designed to work on a local server.
 
 ## Getting Started
 
@@ -12,47 +10,35 @@ These instructions will help you get a copy of the project up and running on you
 
 - Node.js
 - Express
-- EJS
+- EJS templating engine
 - Mongoose
 - bcrypt
 - JWT
-- Cookie-parser
-- FS
+- cookie-parser
 
 ### Installing
 
 1. Clone the repository
-2. Install Node.js and other required packages
-3. Set up your local server
-4. Run the application
+2. Install dependencies with `npm install`
+3. Start the server with `npm start`
 
-## Important Note
-
+### Important Note
 This project is designed to work on a local server only.
 
 ## Built With
-
 - Node.js
 - Express
-- EJS
+- EJS templating engine
 - Mongoose
 - bcrypt
 - JWT
-- Cookie-parser
-- FS
+- cookie-parser
 
 ## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests to us.
-
-## Authors
-
-- Darkx-dev
+Please read [CONTRIBUTING.md](https://github.com/Darkx-dev/instagram-clone-fullstack/blob/main/CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests to us.
 
 ## License
-
 This project is licensed under the MIT License.
 
-## About
-
-This project is an Instagram clone with authentication features, designed to work on a local server.
+## About the Project
+This repository contains the code for an Instagram clone built using Node.js, Express, EJS templating engine, and Mongoose. It includes authentication features using bcrypt, JWT, and cookie-parser, and is designed to work on a local server.
