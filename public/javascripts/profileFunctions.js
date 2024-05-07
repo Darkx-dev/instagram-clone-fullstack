@@ -11,8 +11,6 @@ settingsPopup.forEach((popup) =>
   popup.addEventListener("click", (e) => {
     if (e.target.id == "cancle" || e.target == popup) {
       popup.style.display = "none";
-    } else if (e.target.textContent.toLowerCase().includes("log out")) {
-      window.location.href = "/logout";
     }
   })
 );

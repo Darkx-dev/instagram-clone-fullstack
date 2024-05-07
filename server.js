@@ -59,20 +59,19 @@ app.get("/login", async (req, res) => {
 });
 
 app.get("/user/create", (req, res) => {
-  
   res.render("register", { message: "sefe" });
 });
 
 app.get("/:username", isAuthorised, async (req, res) => {
   if (req.params.username == req.data.user.username) {
-    res.render("profile", { user: req.data.user });
-    return;
+    return res.render("profile", {
+      user: await req.data.user.populate("posts"),
+    });
   }
   res.status(404).redirect("/login");
 });
 
-
-app.get("/logout", (req, res) => {
+app.get("/:username/logout", (req, res) => {
   res.clearCookie("token");
   res.redirect("/login");
 });
@@ -102,7 +101,7 @@ app.post("/create", async (req, res) => {
       bcrypt.hash(password, 10, async function (err, hash) {
         await userModel.create({ username, password: hash });
       });
-      res.redirect(`/${username}`);
+      res.redirect(`/`);
     } else {
       return res.render("signup", {
         message: "username/passowrd cannot be blank",
@@ -122,9 +121,9 @@ app.post("/:username/upload", isAuthorised, fileUpload(), async (req, res) => {
     uploadedFile.name.lastIndexOf("."),
     uploadedFile.name.name
   );
-  
+
   await makeDirectories(req);
-  
+
   if (imageExtention == ".png" || imageExtention == ".jpg") {
     // Uploading pfp to pfp directory
     return uploadedFile.mv(
@@ -141,12 +140,11 @@ app.post("/:username/upload", isAuthorised, fileUpload(), async (req, res) => {
           }
         );
         // res.send("OK")
-        return res.redirect(`/${req.data.user.username}`);
+        return res.redirect(`/${req.data.user.username}/edit`);
       }
     );
   }
   res.send("error");
-  // res.redirect(`/${req.data.user.username}`);
 });
 
 //Create a new post----------------------------------------------------------------
@@ -158,19 +156,22 @@ app.post(
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded.");
     }
+    if (imageExtention != ".png" || imageExtention != ".jpg") {
+      res.send("Unsupported image extention");
+    }
 
-    await makeDirectories(req)
+    await makeDirectories(req);
 
-    const user = await userModel.findOne({username: req.params.username})
-    console.log(user)
+    const user = await userModel.findOne({ username: req.params.username });
+    console.log(user);
     const post = await postModel.create({
       user: req.data.user._id,
-      caption: req.body.caption
-    })
-    user.posts.push(post._id)
-    await user.save()
+      caption: req.body.caption,
+    });
+    user.posts.push(post._id);
+    await user.save();
 
-    let uploadedPost = req.files.uploadedPost
+    let uploadedPost = req.files.uploadedPost;
     uploadedPost.mv(
       path.join(
         __dirname,
@@ -184,6 +185,19 @@ app.post(
     res.redirect(`/${req.data.user.username}`);
   }
 );
+
+// Update user profile
+app.patch("/:username/edit", isAuthorised, async (req, res) => {
+  if (req.data.isAuthorised) {
+    const user = await userModel.findOne({ username: req.params.username });
+    const { gender, bio, age } = req.body;
+    user.gender = gender;
+    user.bio = bio;
+    user.age = age;
+    console.log(req.body, user);
+  }
+  res.redirect(`/${req.data.user.username}`);
+});
 
 app.get("/:username/edit", isAuthorised, async (req, res) => {
   if (req.data.isAuthorised) {

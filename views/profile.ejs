@@ -136,9 +136,10 @@
       <div class="user__posts__wrapper grid grid-cols-3 gap-2 relative max-md:gap-1">
         <% if (user?.posts.length > 0) { %>
           <% user?.posts.forEach(post => { %>
-            <div class="user__post">
+            <div class="user__post cursor-pointer">
               <div class="post__image overflow-hidden">
-                <img class="aspect-square object-cover" src="/static/users/<%=user._id%>/posts/<%=post %>.png" alt="">
+                <img class="aspect-square object-cover" src="/static/users/<%=user._id%>/posts/<%=post._id%>.png" alt="">
+                <p class="text-sm"><%=post.caption %></p>
               </div>
             </div>
           <% }) %>
@@ -159,7 +160,7 @@
         <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Notifications</li>
         <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Settings and privacy</li>
         <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Supervision</li>
-        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]">Log out</li>
+        <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]"><a href="/<%=user.username%>/logout">Log out</a></li>
         <li class="py-3 active:bg-[#202020] border-t border-[#2E2E2E]" id="cancle">
           Cancel
         </li>

@@ -6,6 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Edit profile | <%=user?.username %></title>
   <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    /* Custom styling for the select element */
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+        appearance: none;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23333333"><path d="M10 12l-5-5h10l-5 5z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5em;
+    }
+</style>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -13,7 +27,7 @@
   <header>
     <h1 class="font-bold text-2xl py-5">Edit profile</h1>
   </header>
-  <main>
+  <main class="flex flex-col gap-5">
     <div class="edit__pfp bg-[#262626] p-4 rounded-md flex items-center justify-between">
       <div class="current__wrapper flex items-center gap-5">
         <div class="current__pfp border-2 w-fit overflow-hidden bg-zinc-700 rounded-full">
@@ -23,12 +37,9 @@
           <div class="current__username">
             <h3 class="username text-xl font-bold"><%=user?.username %></h3>
           </div>
-          <div class="current__bio">
-            <p><%=user.bio %></p>
-          </div>
         </div>
       </div>
-      <div class="upload__btn_wrapper">
+      <div class="upload_pfp__btn_wrapper">
         <label class="bg-[#1877F2] px-3 py-2 rounded-md cursor-pointer" for="upload__pfp">
           Change photo
         </label>
@@ -36,9 +47,41 @@
           <input hidden type="file" name="uploadedFile" id="upload__pfp" onchange="form.submit()">
         </form>
       </div>
-
     </div>
+    <div class="current__bio__wrapper">
+      <h3 class="text-xl font-bold mb-3">Bio</h3>
+      <div class="current__bio">
+        <form action="update" method="patch" id="updateForm">
+          <textarea class="w-full rounded-md border border-[#363636] bg-transparent text-white px-3 py-2" name="bio" id="bio"><%=user?.bio%></textarea>
+        </form>
+      </div>
+    </div>
+    <div class="current__gender__wrapper">
+      <h3 class="text-xl font-bold mb-3">Gender</h3>
+      <div class="current__gender">
+        <form action="update" method="patch" id="updateForm">
+          <select class="w-full rounded-md border border-[#363636] bg-transparent text-white px-3 py-2" name="gender" id="gender">
+            <option class="bg-black cursor-pointer" value="male">Male</option>
+            <option class="bg-black cursor-pointer" value="female">Female</option>
+          </select>
+        </form>
+      </div>
+    </div>
+    <div class="current__age__wrapper">
+      <h3 class="text-xl font-bold mb-3">Age</h3>
+      <div class="current__age">
+        <form action="update" method="patch" id="updateForm">
+          <input class="w-full bg-transparent border-[#363636] border rounded-md text-white px-3 py-2 text-start" type="number" min="13" max="90" name="age" id="age" value="<%=user?.age%>">
+        </form>
+      </div>
+    </div>
+    <div class="submit__form__btn__wrapper w-full">
+      <button class="bg-blue-500 px-3 py-2 rounded-md uppercase w-full font-bold mx-auto w-fit tracking-[2px]" type="submit" onclick="submitForms()">Save</button>
+    </div>
+
   </main>
+  
+  <script src="/static/javascripts/editFunctions.js"></script>
 </body>
 
 </html>
