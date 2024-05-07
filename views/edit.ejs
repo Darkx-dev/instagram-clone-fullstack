@@ -17,7 +17,7 @@
     <div class="edit__pfp bg-[#262626] p-4 rounded-md flex items-center justify-between">
       <div class="current__wrapper flex items-center gap-5">
         <div class="current__pfp border-2 w-fit overflow-hidden bg-zinc-700 rounded-full">
-          <img class="object-cover aspect-square w-[50px] object-center" src="<%=user?.image%>" alt="">
+          <img class="object-cover aspect-square w-[50px] object-center" src="<%=!user?.image?"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXh3OW9xaWt2cTltYzF3ZTZubGVhZjVlem4wdGE5ZGg4bnFtcW0zaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjHERaTIdeuFQrXq/giphy.gif":user.image%>" alt="">
         </div>
         <div class="current__details">
           <div class="current__username">

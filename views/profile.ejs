@@ -44,8 +44,8 @@
     <div class="top user__profile__wrapper flex flex-col max-md:p-3 max-md:pb-0 w-full">
       <div class="user__profile__top flex justify-start w-full gap-24 max-md:gap-5 max-md:justify-between">
         <div class="user__pfp__wrapper flex items-center justify-center">
-          <div class="user__pfp overflow-hidden rounded-full w-[150px] max-md:max-w-[100px] border-2 border-white bg-zinc-700 ">
-            <img class="w-full object-cover aspect-square object-center" src="<%=!user?.image?"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXh3OW9xaWt2cTltYzF3ZTZubGVhZjVlem4wdGE5ZGg4bnFtcW0zaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjHERaTIdeuFQrXq/giphy.gif":user.image %>" alt=" ">
+          <div class="user__pfp overflow-hidden rounded-full w-[150px] max-md:max-w-[95px] border-2 border-white bg-zinc-700 ">
+            <img class="w-full object-cover aspect-square object-center" src="<%=!user?.image?"https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXh3OW9xaWt2cTltYzF3ZTZubGVhZjVlem4wdGE5ZGg4bnFtcW0zaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjHERaTIdeuFQrXq/giphy.gif":user.image%>" alt=" ">
           </div>
         </div>
         <div class="user__info flex flex-col gap-4 p-10 max-md:p-0 max-md:w-full">
@@ -133,14 +133,18 @@
           </div>
         </a>
       </div>
-      <div class="user__posts__wrapper grid grid-cols-3 gap-2 max-md:gap-1">
-        <% user?.posts.forEach(post => { %>
-          <div class="user__post">
-            <div class="post__image overflow-hidden">
-              <img class="aspect-square object-cover" src="/static/users/<%=user._id%>/posts/<%=post %>.png" alt="">
+      <div class="user__posts__wrapper grid grid-cols-3 gap-2 relative max-md:gap-1">
+        <% if (user?.posts.length > 0) { %>
+          <% user?.posts.forEach(post => { %>
+            <div class="user__post">
+              <div class="post__image overflow-hidden">
+                <img class="aspect-square object-cover" src="/static/users/<%=user._id%>/posts/<%=post %>.png" alt="">
+              </div>
             </div>
-          </div>
-        <% }) %>
+          <% }) %>
+        <% } else { %> 
+          <h2 class="mx-auto absolute right-0 left-0 text-center">No posts yet</h2>
+        <% } %>
 
       </div>
       <footer class="my-3 py-2 w-full"></footer>

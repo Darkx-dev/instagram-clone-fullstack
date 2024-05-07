@@ -293,9 +293,6 @@
   
   /* Media Queries */
   @media (max-width:450px) {
-    .main {
-      /* background-color: #fff; */
-    }
   
     .content {
       max-width: 100%;

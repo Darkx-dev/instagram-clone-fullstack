@@ -58,6 +58,11 @@ app.get("/login", async (req, res) => {
   res.status(404).render("login", { message: "" });
 });
 
+app.get("/user/create", (req, res) => {
+  
+  res.render("register", { message: "sefe" });
+});
+
 app.get("/:username", isAuthorised, async (req, res) => {
   if (req.params.username == req.data.user.username) {
     res.render("profile", { user: req.data.user });
@@ -65,9 +70,7 @@ app.get("/:username", isAuthorised, async (req, res) => {
   }
   res.status(404).redirect("/login");
 });
-app.get("/create", (req, res) => {
-  res.render("register", { message: "" });
-});
+
 
 app.get("/logout", (req, res) => {
   res.clearCookie("token");
@@ -119,9 +122,9 @@ app.post("/:username/upload", isAuthorised, fileUpload(), async (req, res) => {
     uploadedFile.name.lastIndexOf("."),
     uploadedFile.name.name
   );
-
+  
   await makeDirectories(req);
-
+  
   if (imageExtention == ".png" || imageExtention == ".jpg") {
     // Uploading pfp to pfp directory
     return uploadedFile.mv(
@@ -132,11 +135,12 @@ app.post("/:username/upload", isAuthorised, fileUpload(), async (req, res) => {
       async (err) => {
         if (err) return res.status(500).send(err);
         await userModel.findOneAndUpdate(
-          { username: req.data.user._id },
+          { username: req.data.user.username },
           {
             image: `/static/users/${req.data.user._id}/pfp/${req.data.user._id}.png`,
           }
         );
+        // res.send("OK")
         return res.redirect(`/${req.data.user.username}`);
       }
     );

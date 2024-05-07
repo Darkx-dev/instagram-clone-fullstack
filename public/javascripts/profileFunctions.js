@@ -18,13 +18,16 @@ settingsPopup.forEach((popup) =>
 );
 
 const postUpload = document.querySelector("#postUpload");
-console.log(postUpload);
+const imgWrapper = document.querySelector("#imgWrapper");
+const delAfter = document.querySelectorAll(".delAfter");
+console.log(delAfter);
 postUpload.addEventListener("change", (e) => {
   var files = e.target.files;
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
     var img = document.createElement("img");
+    img.id = "upload__preview";
     var reader = new FileReader();
 
     reader.onloadend = function () {
@@ -32,6 +35,12 @@ postUpload.addEventListener("change", (e) => {
     };
 
     reader.readAsDataURL(file);
-    postUpload.parentNode.insertBefore(img, postUpload.nextSibling);
+    img.style.objectFit = "cover";
+    img.style.aspectRatio = "1/1";
+    imgWrapper.style.maxWidth = "100%";
+    imgWrapper.appendChild(img);
   }
+  delAfter.forEach((delElem) => {
+    delElem.style.display = "none";
+  });
 });
