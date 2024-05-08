@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%=to=="login"?"Register":"Login" %></title>
+  <title><%=to=="user/login"?"Register":"Login" %></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/styles/form.css">
 
@@ -23,7 +23,10 @@
           <div class="content">
             <div class="login-box">
               <div class="header py-10">
-                <a href="/"><img class="invert" src="https://see.fontimg.com/api/renderfont4/dE0g/eyJyIjoiZnMiLCJoIjo4MSwidyI6MTI1MCwiZnMiOjY1LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/TmlnZ2FncmFt/beautiful-people-personal-use.png" alt="Lettering fonts"></a>
+                <a href="/">
+                  <img class="invert" src="https://see.fontimg.com/api/renderfont4/dE0g/eyJyIjoiZnMiLCJoIjo4MSwidyI6MTI1MCwiZnMiOjY1LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/TmlnZ2FncmFt/beautiful-people-personal-use.png" alt="Lettering fonts">
+                  <!-- <i class="invert scale-125" data-visualcompletion="css-img" aria-label="Instagram" class="" role="img" style="background-image: url(&quot;https://static.cdninstagram.com/rsrc.php/v3/yM/r/8n91YnfPq0s.png&quot;); background-position: 0px -52px; background-size: auto; width: 175px; height: 51px; background-repeat: no-repeat; display: inline-block;"></i> -->
+                </a>
                 <!-- <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png" alt="Instagram"> -->
               </div><!-- Header end -->
               <div class="form-wrap">
@@ -39,7 +42,7 @@
 
                   <span class="button-box">
                     <button class="btn" type="submit" name="submit">
-                      <%=to!="login"?"Log in":"Sign up" %>
+                      <%=to!="user/login"?"Log in":"Sign up" %>
                     </button>
                   </span>
 
@@ -52,11 +55,11 @@
 
               <p class="text text-white">
                 <span>
-                  <%=to=="login"?"Have an account?":"Don't have an account?"%>
+                  <%=to=="user/login"?"Have an account?":"Don't have an account?"%>
                 </span>
                 <a href="/<%=to%>">
                   <span>
-                    <%=to=="login"?"Log in":"Sign up" %>
+                    <%=to=="user/login"?"Log in":"Sign up" %>
                   </span>
                 </a>
               </p>

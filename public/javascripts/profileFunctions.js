@@ -18,7 +18,6 @@ settingsPopup.forEach((popup) =>
 const postUpload = document.querySelector("#postUpload");
 const imgWrapper = document.querySelector("#imgWrapper");
 const delAfter = document.querySelectorAll(".delAfter");
-console.log(delAfter);
 postUpload.addEventListener("change", (e) => {
   var files = e.target.files;
 

@@ -3,41 +3,32 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const methodOverride = require("method-override");
 const path = require("path");
 const app = express();
+const { isAuthorised } = require("./auth");
 const { mkdir } = require("fs").promises;
 const userModel = require("./models/user");
 const postModel = require("./models/post");
+const { readSubDirectories, deletePost } = require("./fs-functions");
+const user = require("./models/user");
 const port = 8080;
 
+// Making Directories for each user before creating and setting up user.image path if not exists
 const makeDirectories = async (req) => {
-  // Making Directories for each user before creating and setting up user.image path
-  await mkdir("public/users").catch((err) => {});
-  await mkdir(`public/users/${req.data.user._id}`).catch((err) => {});
-  await mkdir(`public/users/${req.data.user._id}/pfp`).catch((err) => {});
-  await mkdir(`public/users/${req.data.user._id}/posts`).catch((err) => {});
-};
-// Functions for protected routes
-const isAuthorised = async (req, res, next) => {
-  const token = req.cookies.token || null;
-
-  if (token) {
-    // return res.send(token)
-    const { username, password } = jwt.verify(token, "secret");
-    const user = await userModel.findOne({
-      username,
-    });
-    // return res.send(user)
-    if (user) {
-      const isPass = await bcrypt.compare(password, user.password);
-      req.data = { user: user, isAuthorised: isPass };
-      if (isPass) {
-        // return res.send(isPass)
-        return next();
+  if (!readSubDirectories("./public/users")) {
+    const { _id } = req.data.user;
+    await mkdir("public/users").catch((err) => {});
+    if (!readSubDirectories(`./public/${_id}`)) {
+      await mkdir(`./public/users/${_id}`).catch((err) => {});
+      if (!readSubDirectories(`./public/${_id}/pfp`)) {
+        await mkdir(`./public/users/${_id}/pfp`).catch((err) => {});
+        if (!readSubDirectories(`./public/${_id}/posts`)) {
+          await mkdir(`./public/users/${_id}/posts`).catch((err) => {});
+        }
       }
     }
   }
-  res.redirect("/login");
 };
 
 app.set("view engine", "ejs");
@@ -46,37 +37,41 @@ app.use("/static", express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
 
 app.get("/", isAuthorised, async (req, res) => {
   if (req.data.isAuthorised) {
     return res.redirect(`/${req.data.user.username}`);
   }
-  res.redirect("/create");
+  res.redirect("/user/create");
 });
 
-app.get("/login", async (req, res) => {
+app.get("/user/login", async (req, res) => {
   res.status(404).render("login", { message: "" });
 });
 
 app.get("/user/create", (req, res) => {
-  res.render("register", { message: "sefe" });
+  res.render("register", { message: "" });
 });
 
 app.get("/:username", isAuthorised, async (req, res) => {
-  if (req.params.username == req.data.user.username) {
-    return res.render("profile", {
-      user: await req.data.user.populate("posts"),
-    });
+  if (req.data.isAuthorised) {
+    if (req.params.username == req.data.user.username) {
+      return res.render("profile", {
+        user: await req.data.user.populate("posts"),
+      });
+    }
+    return res.status(404).send("NIGGA YOU ARE NOT " + req.params.username);
   }
-  res.status(404).redirect("/login");
+  res.redirect("/user/login");
 });
 
 app.get("/:username/logout", (req, res) => {
   res.clearCookie("token");
-  res.redirect("/login");
+  res.redirect("/user/login");
 });
 
-app.post("/login", async (req, res) => {
+app.post("/user/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
   if (user) {
@@ -90,23 +85,22 @@ app.post("/login", async (req, res) => {
   res.status(404).render("login", { message: "Invalid Login Details" });
 });
 
-app.post("/create", async (req, res) => {
+app.post("/user/create", async (req, res) => {
   // res.connection.setTimeout(0);
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
   if (!user) {
-    if (username.length != 0 && password.length != 0) {
-      const token = jwt.sign({ username, password }, "secret");
-      res.cookie("token", token);
-      bcrypt.hash(password, 10, async function (err, hash) {
-        await userModel.create({ username, password: hash });
-      });
-      res.redirect(`/`);
-    } else {
+    if (username.length == 0 && password.length == 0) {
       return res.render("signup", {
         message: "username/passowrd cannot be blank",
       });
     }
+    const token = jwt.sign({ username, password }, "secret");
+    res.cookie("token", token);
+    bcrypt.hash(password, 10, async function (err, hash) {
+      await userModel.create({ username, password: hash });
+    });
+    return res.redirect(`/${username}`);
   }
   res.render("register", { message: "Username Already Taken" });
 });
@@ -156,14 +150,9 @@ app.post(
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded.");
     }
-    if (imageExtention != ".png" || imageExtention != ".jpg") {
-      res.send("Unsupported image extention");
-    }
-
     await makeDirectories(req);
 
     const user = await userModel.findOne({ username: req.params.username });
-    console.log(user);
     const post = await postModel.create({
       user: req.data.user._id,
       caption: req.body.caption,
@@ -171,7 +160,15 @@ app.post(
     user.posts.push(post._id);
     await user.save();
 
-    let uploadedPost = req.files.uploadedPost;
+    const uploadedPost = req.files.uploadedPost;
+    const imageExtention = uploadedPost.name.slice(
+      uploadedPost.name.lastIndexOf("."),
+      uploadedPost.name.name
+    );
+    // if (imageExtention != ".png" || imageExtention != ".jpg") {
+    //   res.send("Unsupported image extention");
+    // }
+
     uploadedPost.mv(
       path.join(
         __dirname,
@@ -187,23 +184,34 @@ app.post(
 );
 
 // Update user profile
-app.patch("/:username/edit", isAuthorised, async (req, res) => {
+app.patch("/:username/update", isAuthorised, async (req, res) => {
   if (req.data.isAuthorised) {
-    const user = await userModel.findOne({ username: req.params.username });
     const { gender, bio, age } = req.body;
-    user.gender = gender;
-    user.bio = bio;
-    user.age = age;
-    console.log(req.body, user);
+    const user = await userModel.findOneAndUpdate(
+      { username: req.params.username },
+      { bio, age, gender }
+    );
   }
   res.redirect(`/${req.data.user.username}`);
+});
+
+app.patch("/:username/posts/delete", isAuthorised, async (req, res) => {
+  const post = await postModel.findOneAndDelete({ _id: req.body.postID });
+  const user = await userModel.findOneAndUpdate(
+    { username: req.params.username },
+    { $pull: { posts: req.body.postID } }
+  );
+  deletePost(post._id, user._id, "./public/users");
+  res.redirect(`/${req.params.username}`);
 });
 
 app.get("/:username/edit", isAuthorised, async (req, res) => {
   if (req.data.isAuthorised) {
     return res.render("edit", { user: req.data.user });
   }
-  res.status(404).redirect("/login");
+  res.status(404).redirect("/user/login");
 });
 
-app.listen(port, () => {});
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});

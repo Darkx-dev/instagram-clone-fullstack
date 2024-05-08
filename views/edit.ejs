@@ -9,17 +9,17 @@
   <style>
     /* Custom styling for the select element */
     select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        cursor: pointer;
-        appearance: none;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23333333"><path d="M10 12l-5-5h10l-5 5z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 1.5em 1.5em;
-        padding-right: 2.5em;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23333333"><path d="M10 12l-5-5h10l-5 5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5em;
     }
-</style>
+  </style>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -48,39 +48,39 @@
         </form>
       </div>
     </div>
-    <div class="current__bio__wrapper">
-      <h3 class="text-xl font-bold mb-3">Bio</h3>
-      <div class="current__bio">
-        <form action="update" method="patch" id="updateForm">
+    <form action="update?_method=PATCH" method="post" id="updateForm" class="flex flex-col gap-3">
+      <div class="current__bio__wrapper">
+        <h3 class="text-xl font-bold mb-3">Bio</h3>
+        <div class="current__bio">
           <textarea class="w-full rounded-md border border-[#363636] bg-transparent text-white px-3 py-2" name="bio" id="bio"><%=user?.bio%></textarea>
-        </form>
+
+        </div>
       </div>
-    </div>
-    <div class="current__gender__wrapper">
-      <h3 class="text-xl font-bold mb-3">Gender</h3>
-      <div class="current__gender">
-        <form action="update" method="patch" id="updateForm">
+      <div class="current__gender__wrapper">
+        <h3 class="text-xl font-bold mb-3">Gender</h3>
+        <div class="current__gender">
+
           <select class="w-full rounded-md border border-[#363636] bg-transparent text-white px-3 py-2" name="gender" id="gender">
             <option class="bg-black cursor-pointer" value="male">Male</option>
             <option class="bg-black cursor-pointer" value="female">Female</option>
           </select>
-        </form>
-      </div>
-    </div>
-    <div class="current__age__wrapper">
-      <h3 class="text-xl font-bold mb-3">Age</h3>
-      <div class="current__age">
-        <form action="update" method="patch" id="updateForm">
-          <input class="w-full bg-transparent border-[#363636] border rounded-md text-white px-3 py-2 text-start" type="number" min="13" max="90" name="age" id="age" value="<%=user?.age%>">
-        </form>
-      </div>
-    </div>
-    <div class="submit__form__btn__wrapper w-full">
-      <button class="bg-blue-500 px-3 py-2 rounded-md uppercase w-full font-bold mx-auto w-fit tracking-[2px]" type="submit" onclick="submitForms()">Save</button>
-    </div>
 
+        </div>
+      </div>
+      <div class="current__age__wrapper">
+        <h3 class="text-xl font-bold mb-3">Age</h3>
+        <div class="current__age">
+
+          <input class="w-full bg-transparent border-[#363636] border rounded-md text-white px-3 py-2 text-start" type="number" min="13" max="90" name="age" id="age" value="<%=user?.age%>">
+
+        </div>
+      </div>
+      <div class="submit__form__btn__wrapper w-full">
+        <button class="bg-blue-500 px-3 py-2 rounded-md uppercase w-full font-bold mx-auto w-fit tracking-[2px]" type="submit" onclick="submitForms()">Save</button>
+      </div>
+    </form>
   </main>
-  
+
   <script src="/static/javascripts/editFunctions.js"></script>
 </body>
 
